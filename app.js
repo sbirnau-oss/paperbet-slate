@@ -91,6 +91,10 @@
   async function unlock(passphrase) {
     const error = document.getElementById('unlock-error');
     error.textContent = '';
+    if (!state.envelope) {
+      error.textContent = 'Payload-ul criptat încă se încarcă.';
+      return;
+    }
     try {
       state.model = await decryptEnvelope(state.envelope, passphrase);
       sessionStorage.setItem('paperbet-slate-key', passphrase);
@@ -106,6 +110,8 @@
     state.envelope = await response.json();
     document.getElementById('publication-meta').textContent =
       `Zi operațională: ${state.envelope.operational_day} · publicat: ${new Date(state.envelope.published_at).toLocaleString('ro-RO')}`;
+    document.getElementById('passphrase').disabled = false;
+    document.getElementById('unlock-button').disabled = false;
     const remembered = sessionStorage.getItem('paperbet-slate-key');
     if (remembered) await unlock(remembered);
   }
